@@ -1,0 +1,19 @@
+{
+  "name": "signal-newsletter",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Signal amidst the Noise.",
+  "author": "hanwei <i@hanwei.ink>",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:freedomsky11/signal.git"
+  },
+  "scripts": {
+    "dev": "vitepress dev docs",
+    "build": "vitepress build docs",
+    "preview": "vitepress preview docs"
+  },
+  "devDependencies": {
+    "vitepress": "^1.0.0"
+  }
+}
