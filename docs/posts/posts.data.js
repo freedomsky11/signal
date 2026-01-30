@@ -8,7 +8,6 @@ export default {
     const posts = []
     const postsDir = path.resolve(__dirname)
     
-    // Safety check for directories
     if (!fs.existsSync(postsDir)) return []
 
     const years = fs.readdirSync(postsDir).filter(f => /^\d{4}$/.test(f))
@@ -26,36 +25,31 @@ export default {
            const { data } = matter(src)
            const slug = file.replace('.md', '')
            
-           // URL Logic:
-           // If filename is 2026-01-08.md, we want /posts/2026/01/2026-01-08
-           // This matches the file structure and avoids 404.
-           const urlSlug = slug
-           
+           // Format date nicely: YYYY-MM-DD
+           let dateStr = data.date 
+           if (dateStr instanceof Date) {
+              dateStr = dateStr.toISOString().split('T')[0]
+           } else if (!dateStr) {
+              dateStr = `${year}-${month}-01` // Fallback
+           }
+
            posts.push({
              title: data.title || slug,
-             url: `/posts/${year}/${month}/${urlSlug}`,
+             url: `/posts/${year}/${month}/${slug}`, // Robust URL
              date: {
-                time: +new Date(data.date || `${year}-${month}-01`),
-                string: data.date || `${year}-${month}`
+                time: +new Date(dateStr),
+                string: dateStr
              },
+             summary: data.summary || '',
              year
            })
         }
       }
     }
     
+    // Sort by date desc
     posts.sort((a, b) => b.date.time - a.date.time)
 
-    // Group by year
-    const grouped = {}
-    posts.forEach(p => {
-        if(!grouped[p.year]) grouped[p.year] = []
-        grouped[p.year].push(p)
-    })
-    
-    return Object.keys(grouped).sort().reverse().map(y => ({
-        year: y,
-        items: grouped[y]
-    }))
+    return posts
   }
 }
