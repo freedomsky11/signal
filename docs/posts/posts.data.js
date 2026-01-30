@@ -26,8 +26,10 @@ export default {
            const { data } = matter(src)
            const slug = file.replace('.md', '')
            
-           // Clean URL: 2026-01-08 -> 08
-           const urlSlug = /^\d{4}-\d{2}-\d{2}$/.test(slug) ? slug.slice(8) : slug
+           // URL Logic:
+           // If filename is 2026-01-08.md, we want /posts/2026/01/2026-01-08
+           // This matches the file structure and avoids 404.
+           const urlSlug = slug
            
            posts.push({
              title: data.title || slug,

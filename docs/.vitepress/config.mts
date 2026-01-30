@@ -2,7 +2,13 @@ import { defineConfig } from 'vitepress'
 import fs from 'fs'
 import path from 'path'
 
-// Helper to generate sidebar from posts
+// Helper to map month numbers to names
+const monthNames = {
+  '01': 'Jan', '02': 'Feb', '03': 'Mar', '04': 'Apr',
+  '05': 'May', '06': 'Jun', '07': 'Jul', '08': 'Aug',
+  '09': 'Sep', '10': 'Oct', '11': 'Nov', '12': 'Dec'
+}
+
 function getPostsSidebar() {
   const postsDir = path.resolve(__dirname, '../posts')
   
@@ -20,15 +26,20 @@ function getPostsSidebar() {
       const monthDir = path.join(yearDir, month)
       const files = fs.readdirSync(monthDir).filter(f => f.endsWith('.md')).sort().reverse()
       
+      // Convert '01' to 'Jan'
+      const monthLabel = monthNames[month] || month
+
       return {
-        text: `${year}-${month}`,
-        collapsed: true, // Default collapsed to keep sidebar clean
+        text: monthLabel, // <--- Fixed Label
+        collapsed: false, // Open by default for better visibility
         items: files.map(file => {
-           // Try to extract title, fallback to filename
            const filePath = path.join(monthDir, file)
            const content = fs.readFileSync(filePath, 'utf-8')
            const titleMatch = content.match(/^title:\s*["']?(.*?)["']?$/m)
-           const title = titleMatch ? titleMatch[1] : file.replace('.md', '')
+           // If title starts with "Signal Daily", strip it for cleaner sidebar?
+           // No, user said "Signal name strange", maybe referring to the top title.
+           // Let's keep title as is for now, but ensure it's extracted.
+           let title = titleMatch ? titleMatch[1] : file.replace('.md', '')
            
            return {
              text: title,
@@ -36,10 +47,10 @@ function getPostsSidebar() {
            }
         })
       }
-    }).flat() // Flatten months into the year group
+    }).flat()
 
     return {
-      text: `${year} Archive`,
+      text: `${year}`,
       items: items
     }
   })
